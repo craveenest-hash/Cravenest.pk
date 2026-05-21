@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CraveNest — Menu Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ol:#1b2210;--ol2:#222c15;--ol3:#2a3619;--ol4:#313f1e;--gd:#c89535;--gdl:#e4b55c;--cr:#f5eed8;--mu:#7a8a60;--br:rgba(200,149,53,.22);--br2:rgba(200,149,53,.1);--tx:#ede5cc;--rd:#f87171;--gr:#4ade80;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--ol);color:var(--tx);font-family:'Outfit',sans-serif;min-height:100vh;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--ol);}::-webkit-scrollbar-thumb{background:var(--gd);border-radius:3px;}
+
+/* LOGIN */
+.lw{min-height:100vh;display:grid;place-items:center;background:var(--ol2);}
+.lb{background:var(--ol3);border:1px solid var(--br);border-radius:14px;padding:3rem;width:380px;max-width:92vw;text-align:center;}
+.lb h1{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--cr);margin-bottom:.3rem;}
+.lb h1 span{color:var(--gd);}
+.lb p{color:var(--mu);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:2rem;}
+.lf{margin-bottom:1rem;text-align:left;}
+.lf label{display:block;font-size:.67rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-bottom:.38rem;}
+.lf input{width:100%;background:var(--ol2);border:1px solid var(--br2);color:var(--tx);font-family:'Outfit',sans-serif;font-size:.9rem;padding:.78rem 1rem;border-radius:5px;outline:none;transition:border-color .2s;}
+.lf input:focus{border-color:var(--gd);}
+.lf input::placeholder{color:var(--mu);}
+.lerr{color:var(--rd);font-size:.76rem;margin-bottom:.8rem;display:none;}
+.bgold{background:var(--gd);color:var(--ol);border:none;padding:.88rem;font-family:'Outfit',sans-serif;font-weight:600;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;border-radius:3px;cursor:pointer;width:100%;transition:background .2s;}
+.bgold:hover{background:var(--gdl);}
+
+/* APP */
+.app{display:none;min-height:100vh;flex-direction:column;}
+header{background:var(--ol2);border-bottom:1px solid var(--br2);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.hbrand{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;color:var(--cr);}
+.hbrand span{color:var(--gd);}
+.htag{background:rgba(200,149,53,.1);border:1px solid var(--br);color:var(--gd);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;padding:.18rem .65rem;border-radius:2rem;margin-left:.6rem;}
+.htime{color:var(--mu);font-size:.76rem;}
+.hout{background:transparent;border:1px solid var(--br2);color:var(--mu);font-family:'Outfit',sans-serif;font-size:.73rem;padding:.35rem .85rem;border-radius:3px;cursor:pointer;transition:all .2s;}
+.hout:hover{border-color:var(--rd);color:var(--rd);}
+
+.tabs{background:var(--ol2);border-bottom:1px solid var(--br2);padding:0 2rem;display:flex;}
+.tab{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--mu);font-family:'Outfit',sans-serif;font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;padding:1rem 1.4rem;cursor:pointer;transition:all .22s;}
+.tab.on{color:var(--gd);border-bottom-color:var(--gd);}
+
+.main{padding:2rem;}
+.stats{display:flex;gap:1rem;margin-bottom:1.8rem;flex-wrap:wrap;}
+.sc{background:var(--ol2);border:1px solid var(--br2);border-radius:8px;padding:1rem 1.4rem;min-width:130px;}
+.scv{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:var(--gd);}
+.scl{font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-top:.2rem;}
+
+.shead{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.3rem;flex-wrap:wrap;gap:1rem;}
+.shead h2{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;}
+.shead h2 em{color:var(--gd);font-style:italic;}
+.addbtn{display:inline-flex;align-items:center;gap:.4rem;background:var(--gd);color:var(--ol);border:none;padding:.6rem 1.2rem;font-family:'Outfit',sans-serif;font-weight:600;font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;border-radius:4px;cursor:pointer;transition:all .2s;}
+.addbtn:hover{background:var(--gdl);}
+
+.frow{display:flex;gap:.7rem;margin-bottom:1.2rem;flex-wrap:wrap;align-items:center;}
+.sbox{display:flex;align-items:center;gap:.5rem;background:var(--ol2);border:1px solid var(--br2);border-radius:5px;padding:.46rem .9rem;flex:1;max-width:300px;}
+.sbox input{background:transparent;border:none;color:var(--tx);font-family:'Outfit',sans-serif;font-size:.83rem;outline:none;flex:1;}
+.sbox input::placeholder{color:var(--mu);}
+.fsel{background:var(--ol2);border:1px solid var(--br2);color:var(--mu);font-family:'Outfit',sans-serif;font-size:.75rem;padding:.46rem .8rem;border-radius:5px;outline:none;cursor:pointer;}
+.fsel option{background:var(--ol2);}
+
+/* TABLE */
+.tw{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;background:var(--ol2);border:1px solid var(--br2);border-radius:10px;overflow:hidden;}
+thead{background:var(--ol3);}
+th{padding:.8rem 1rem;text-align:left;font-size:.63rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);font-weight:500;border-bottom:1px solid var(--br2);}
+td{padding:.8rem 1rem;border-bottom:1px solid rgba(255,255,255,.04);font-size:.83rem;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(200,149,53,.03);}
+.thumb{width:48px;height:48px;border-radius:6px;background:var(--ol3);border:1px solid var(--br2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;overflow:hidden;flex-shrink:0;}
+.thumb img{width:100%;height:100%;object-fit:cover;}
+.icel{display:flex;align-items:center;gap:.85rem;}
+.iname{font-family:'Playfair Display',serif;font-size:.93rem;font-weight:700;color:var(--cr);}
+.idesc{font-size:.7rem;color:var(--mu);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:.15rem;}
+.tpill{display:inline-block;background:rgba(200,149,53,.1);border:1px solid var(--br2);color:var(--gdl);font-size:.57rem;letter-spacing:.07em;text-transform:uppercase;padding:.12rem .45rem;border-radius:2rem;margin:.06rem;}
+.apill{display:inline-block;font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;padding:.13rem .48rem;border-radius:2rem;}
+.ayes{background:rgba(74,222,128,.1);color:var(--gr);border:1px solid rgba(74,222,128,.25);}
+.ano{background:rgba(248,113,113,.1);color:var(--rd);border:1px solid rgba(248,113,113,.25);}
+/* toggle */
+.tog{position:relative;width:36px;height:19px;cursor:pointer;flex-shrink:0;display:inline-block;}
+.tog input{opacity:0;width:0;height:0;position:absolute;}
+.ttr{position:absolute;inset:0;background:var(--ol4);border:1px solid var(--br2);border-radius:10px;transition:all .2s;}
+.ttr::before{content:'';position:absolute;width:13px;height:13px;left:2px;top:2px;background:var(--mu);border-radius:50%;transition:all .2s;}
+.tog input:checked+.ttr{background:rgba(74,222,128,.15);border-color:rgba(74,222,128,.3);}
+.tog input:checked+.ttr::before{transform:translateX(17px);background:var(--gr);}
+/* action btns */
+.ar{display:flex;gap:.35rem;flex-wrap:wrap;}
+.ab{padding:.3rem .7rem;border-radius:3px;font-family:'Outfit',sans-serif;font-size:.68rem;cursor:pointer;border:1px solid;transition:all .15s;font-weight:500;}
+.aedit{border-color:rgba(200,149,53,.4);color:var(--gd);background:rgba(200,149,53,.06);}
+.aedit:hover{background:rgba(200,149,53,.18);}
+.adel{border-color:rgba(248,113,113,.4);color:var(--rd);background:rgba(248,113,113,.06);}
+.adel:hover{background:rgba(248,113,113,.18);}
+.amv{border-color:var(--br2);color:var(--mu);background:transparent;}
+.amv:hover{border-color:var(--gd);color:var(--gd);}
+.amv:disabled{opacity:.3;pointer-events:none;}
+.empty{text-align:center;padding:3rem;color:var(--mu);}
+
+/* DRAWER */
+.dov{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;display:none;justify-content:flex-end;backdrop-filter:blur(4px);}
+.dov.open{display:flex;}
+.drawer{background:var(--ol2);border-left:1px solid var(--br);width:500px;max-width:96vw;height:100vh;overflow-y:auto;display:flex;flex-direction:column;}
+.dhead{display:flex;align-items:center;justify-content:space-between;padding:1.4rem 1.8rem;border-bottom:1px solid var(--br2);position:sticky;top:0;background:var(--ol2);z-index:10;}
+.dtitle{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:900;}
+.dtitle em{color:var(--gd);font-style:italic;}
+.dclose{background:transparent;border:1px solid var(--br2);color:var(--mu);width:30px;height:30px;border-radius:50%;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.dclose:hover{border-color:var(--rd);color:var(--rd);}
+.dbody{padding:1.5rem 1.8rem;flex:1;}
+.dfoot{padding:1rem 1.8rem 1.8rem;border-top:1px solid var(--br2);display:flex;gap:.7rem;background:var(--ol2);position:sticky;bottom:0;}
+.dsave{flex:1;background:var(--gd);color:var(--ol);border:none;padding:.85rem;font-family:'Outfit',sans-serif;font-weight:600;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;border-radius:4px;cursor:pointer;transition:background .2s;}
+.dsave:hover{background:var(--gdl);}
+.dcanc{background:transparent;border:1px solid var(--br2);color:var(--mu);padding:.85rem 1.2rem;font-family:'Outfit',sans-serif;font-size:.78rem;border-radius:4px;cursor:pointer;transition:all .2s;}
+.dcanc:hover{border-color:var(--rd);color:var(--rd);}
+
+/* FORM */
+.df{margin-bottom:1.1rem;}
+.df>label{display:block;font-size:.67rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-bottom:.38rem;}
+.req{color:var(--rd);}
+.hint{color:var(--mu);font-weight:300;text-transform:none;letter-spacing:0;font-size:.62rem;}
+.df input,.df select,.df textarea{width:100%;background:var(--ol3);border:1px solid var(--br2);color:var(--tx);font-family:'Outfit',sans-serif;font-size:.88rem;padding:.7rem .9rem;border-radius:5px;outline:none;transition:border-color .2s,box-shadow .2s;}
+.df input::placeholder,.df textarea::placeholder{color:var(--mu);}
+.df input:focus,.df select:focus,.df textarea:focus{border-color:var(--gd);box-shadow:0 0 0 3px rgba(200,149,53,.1);}
+.df select option{background:var(--ol2);}
+.df textarea{resize:vertical;min-height:72px;line-height:1.55;}
+.dfr{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+
+/* IMAGE UPLOAD */
+.imgdrop{border:2px dashed var(--br);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .25s;min-height:160px;display:flex;align-items:center;justify-content:center;background:var(--ol3);position:relative;}
+.imgdrop:hover{border-color:var(--gd);}
+.imgdrop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2;}
+.imgph{text-align:center;padding:1.5rem;pointer-events:none;}
+.imgph .ic{font-size:2.8rem;display:block;margin-bottom:.5rem;}
+.imgph .pt{font-size:.8rem;color:var(--mu);margin-bottom:.2rem;}
+.imgph .ps{font-size:.67rem;color:var(--mu);opacity:.7;}
+.imgprev{width:100%;position:relative;pointer-events:none;}
+.imgprev img{width:100%;max-height:220px;object-fit:cover;display:block;}
+.rmimg{position:absolute;top:.6rem;right:.6rem;background:rgba(248,113,113,.9);color:#fff;border:none;padding:.3rem .75rem;border-radius:4px;font-size:.72rem;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:600;pointer-events:all;}
+.rmimg:hover{background:var(--rd);}
+
+/* EMOJI */
+.epick{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem;}
+.ep{width:34px;height:34px;background:var(--ol3);border:1px solid var(--br2);border-radius:5px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.ep:hover,.ep.on{border-color:var(--gd);background:rgba(200,149,53,.1);}
+
+/* TAGS */
+.tagbox{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem;background:var(--ol3);border:1px solid var(--br2);border-radius:5px;padding:.4rem .6rem;min-height:42px;cursor:text;transition:border-color .2s;}
+.tagbox:focus-within{border-color:var(--gd);}
+.tchip{background:rgba(200,149,53,.12);border:1px solid var(--br);color:var(--gdl);font-size:.64rem;padding:.16rem .52rem;border-radius:2rem;display:inline-flex;align-items:center;gap:.28rem;white-space:nowrap;}
+.tx{cursor:pointer;opacity:.7;font-size:.9rem;}
+.tx:hover{opacity:1;}
+.tinp{border:none;background:transparent;color:var(--tx);font-family:'Outfit',sans-serif;font-size:.82rem;outline:none;min-width:80px;flex:1;}
+.tinp::placeholder{color:var(--mu);}
+
+/* AVAIL */
+.avrow{display:flex;align-items:center;gap:.7rem;margin-top:.3rem;}
+.avlbl{font-size:.82rem;color:var(--mu);}
+
+/* CONFIRM */
+.cov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:700;display:none;place-items:center;backdrop-filter:blur(5px);}
+.cov.open{display:grid;}
+.cbox{background:var(--ol2);border:1px solid var(--br);border-radius:12px;padding:2.5rem;max-width:360px;width:90%;text-align:center;}
+.cbox h3{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--rd);margin-bottom:.6rem;}
+.cbox p{color:var(--mu);font-size:.84rem;line-height:1.65;margin-bottom:1.5rem;}
+.cbr{display:flex;gap:.7rem;}
+.cno{flex:1;background:transparent;border:1px solid var(--br2);color:var(--mu);padding:.8rem;font-family:'Outfit',sans-serif;font-size:.78rem;border-radius:4px;cursor:pointer;}
+.cno:hover{border-color:var(--gd);color:var(--gd);}
+.cyes{flex:1;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.4);color:var(--rd);padding:.8rem;font-family:'Outfit',sans-serif;font-weight:600;font-size:.78rem;border-radius:4px;cursor:pointer;}
+.cyes:hover{background:rgba(248,113,113,.2);}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.8rem;right:1.8rem;background:var(--ol3);border:1px solid var(--gd);color:var(--cr);padding:.78rem 1.3rem;border-radius:8px;font-size:.82rem;z-index:9999;display:none;max-width:310px;}
+
+@media(max-width:700px){header,.tabs,.main{padding-left:1rem;padding-right:1rem;}.dfr{grid-template-columns:1fr;}.drawer{width:100vw;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="lw" id="lw">
+  <div class="lb">
+    <h1>Crave<span>Nest</span></h1>
+    <p>Menu Manager — Admin Access</p>
+    <div class="lf"><label>Username</label><input type="text" id="lu" placeholder="admin" onkeydown="if(event.key==='Enter')login()"></div>
+    <div class="lf"><label>Password</label><input type="password" id="lp" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"></div>
+    <p class="lerr" id="lerr">❌ Wrong credentials.</p>
+    <button class="bgold" onclick="login()">🔐 Login</button>
+    <p style="margin-top:.9rem;font-size:.7rem;color:var(--mu);">Default: admin / cravenest123</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <header>
+    <div style="display:flex;align-items:center;">
+      <span class="hbrand">Crave<span>Nest</span></span>
+      <span class="htag">Menu Manager</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="htime" id="ht"></span>
+      <button class="hout" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab on" id="t1" onclick="switchTab('frozen')">❄️ Frozen Items</button>
+    <button class="tab" id="t2" onclick="switchTab('cooked')">🍽️ Cooked Meals</button>
+  </div>
+
+  <div class="main">
+    <div class="stats" id="stats"></div>
+    <div class="shead">
+      <div>
+        <h2 id="stitle">Frozen <em>Items</em></h2>
+        <p id="ssub" style="color:var(--mu);font-size:.78rem;margin-top:.25rem;">Manage your frozen product listings.</p>
+      </div>
+      <button class="addbtn" id="addBtn">＋ Add New Item</button>
+    </div>
+    <div class="frow">
+      <div class="sbox"><span style="color:var(--mu)">🔍</span><input type="text" id="sq" placeholder="Search…" oninput="renderTable()"></div>
+      <select class="fsel" id="af" onchange="renderTable()">
+        <option value="all">All Items</option>
+        <option value="yes">Available Only</option>
+        <option value="no">Hidden Only</option>
+      </select>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>#</th><th>Item</th><th>Tags</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="tb"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- DRAWER -->
+<div class="dov" id="dov">
+  <div class="drawer" id="drawer">
+    <div class="dhead">
+      <div class="dtitle" id="dtitle">Add <em>New Item</em></div>
+      <button class="dclose" id="dcloseBtn">✕</button>
+    </div>
+    <div class="dbody">
+      <input type="hidden" id="eid">
+      <div class="dfr">
+        <div class="df"><label>Item Name <span class="req">*</span></label><input type="text" id="dn" placeholder="e.g. Seekh Kabab"></div>
+        <div class="df"><label>Category <span class="req">*</span></label>
+          <select id="dc"><option value="frozen">❄️ Frozen</option><option value="cooked">🍽️ Cooked Meal</option></select>
+        </div>
+      </div>
+      <div class="df"><label>Description <span class="req">*</span></label><textarea id="dd" placeholder="Short mouth-watering description…"></textarea></div>
+      <div class="df"><label>Ingredients <span class="req">*</span></label><textarea id="di" placeholder="e.g. Beef mince, chana dal, ginger, garlic, salt…"></textarea></div>
+      <div class="df"><label>Cooking Method</label><input type="text" id="dco" placeholder="e.g. Shallow Fry · Air Fry · Pan Fry"></div>
+      <div class="dfr">
+        <div class="df"><label>Price (Rs) <span class="req">*</span></label><input type="number" id="dp" placeholder="750" min="1"></div>
+        <div class="df"><label>Unit Label</label><input type="text" id="du" placeholder="/ 6 pcs  or  / serving"></div>
+      </div>
+
+      <!-- IMAGE UPLOAD -->
+      <div class="df">
+        <label>Item Image <span class="hint">(JPG/PNG/WEBP · max 5MB)</span></label>
+        <div class="imgdrop" id="imgdrop">
+          <input type="file" id="imgfile" accept="image/jpeg,image/png,image/webp,image/gif">
+          <div class="imgph" id="imgph">
+            <span class="ic">📸</span>
+            <div class="pt">Click here to upload photo</div>
+            <div class="ps">Square image recommended · min 400×400px</div>
+          </div>
+          <div class="imgprev" id="imgprev" style="display:none">
+            <img id="imgel" src="" alt="Preview">
+            <button type="button" class="rmimg" id="rmimgbtn">✕ Remove</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMOJI -->
+      <div class="df">
+        <label>Fallback Emoji <span class="hint">(shown if no image)</span></label>
+        <input type="text" id="de" placeholder="🍖" maxlength="4" style="width:64px;font-size:1.4rem;text-align:center;padding:.5rem .3rem;">
+        <div class="epick" id="epick"></div>
+      </div>
+
+      <!-- TAGS -->
+      <div class="df">
+        <label>Tags <span class="hint">(Enter or comma to add)</span></label>
+        <div class="tagbox" id="tagbox">
+          <input class="tinp" id="tinp" placeholder="Add a tag…">
+        </div>
+        <div style="font-size:.64rem;color:var(--mu);margin-top:.28rem;">e.g. Bestseller · Premium Beef · Frozen · Fresh Cooked</div>
+      </div>
+
+      <!-- AVAILABILITY -->
+      <div class="df">
+        <label>Availability</label>
+        <div class="avrow">
+          <label class="tog"><input type="checkbox" id="dav" checked><div class="ttr"></div></label>
+          <span class="avlbl" id="avlbl">Available for Order</span>
+        </div>
+      </div>
+    </div>
+    <div class="dfoot">
+      <button class="dcanc" id="dcancBtn">Cancel</button>
+      <button class="dsave" id="dsaveBtn">💾 Save Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="cov" id="cov">
+  <div class="cbox">
+    <h3>🗑️ Delete Item?</h3>
+    <p id="ctxt">Are you sure? This cannot be undone.</p>
+    <div class="cbr">
+      <button class="cno" id="cnoBtn">Cancel</button>
+      <button class="cyes" id="cyesBtn">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ AUTH ══
+function login(){
+  if(document.getElementById('lu').value.trim()==='admin'&&
+     document.getElementById('lp').value.trim()==='cravenest123'){
+    document.getElementById('lw').style.display='none';
+    document.getElementById('app').style.display='flex';
+    init();
+  } else {
+    document.getElementById('lerr').style.display='block';
+  }
+}
+function logout(){
+  document.getElementById('lw').style.display='grid';
+  document.getElementById('app').style.display='none';
+}
+
+// ══ DEFAULT DATA ══
+var DMENU=[
+  {id:'f1',cat:'frozen',emoji:'🥩',tags:['Bestseller','Premium Beef'],name:'Royal Shami Kabab',desc:'Our signature slow-cooked shami kababs — premium beef and a secret blend of traditional whole spices.',ingredients:'Premium beef mince, chana dal, ginger, garlic, green chilli, whole spices, fresh coriander, eggs, salt.',cook:'Shallow Fry · Air Fry · Pan Fry',price:750,unit:'/ 6 pcs',available:true,img:null},
+  {id:'f2',cat:'frozen',emoji:'🍗',tags:['Frozen','Chicken'],name:'Chicken Shami Kabab',desc:'Light and tender chicken shami kababs packed with aromatic spices.',ingredients:'Chicken mince, chana dal, onion, ginger, garlic, green chilli, cumin, coriander powder, garam masala, fresh mint, eggs.',cook:'Shallow Fry · Air Fry · Pan Fry',price:650,unit:'/ 6 pcs',available:true,img:null},
+  {id:'f3',cat:'frozen',emoji:'🍖',tags:['Frozen','Beef'],name:'Seekh Kabab',desc:'Juicy beef seekh kababs seasoned with freshly ground spices and herbs.',ingredients:'Beef mince, raw papaya, onion, green chilli, coriander, mint, cumin, red chilli, garam masala, salt.',cook:'Grill · Pan Fry · Bake · BBQ',price:800,unit:'/ 6 pcs',available:true,img:null},
+  {id:'f4',cat:'frozen',emoji:'🥩',tags:['Frozen','Peshawari'],name:'Chapli Kabab',desc:'Authentic Peshawar-style chapli kababs with pomegranate seeds and tomatoes.',ingredients:'Coarse beef mince, pomegranate seeds, dried coriander, red chilli flakes, cumin, tomato, onion, green chilli, egg, salt.',cook:'Shallow Fry · Pan Fry',price:850,unit:'/ 4 pcs',available:true,img:null},
+  {id:'f5',cat:'frozen',emoji:'🫓',tags:['Frozen','Ready to Cook'],name:'Homestyle Frozen Paratha',desc:'Flaky layered whole-wheat parathas. Ready in under 5 minutes on a tawa.',ingredients:'Whole wheat flour, all-purpose flour, ghee, salt, water.',cook:'Tawa · Griddle',price:400,unit:'/ 5 pcs',available:true,img:null},
+  {id:'f6',cat:'frozen',emoji:'🧆',tags:['Frozen','Snack'],name:'Crispy Chicken Nuggets',desc:'Golden-breaded chicken nuggets with a perfectly seasoned crispy coating.',ingredients:'Chicken breast, breadcrumbs, flour, egg, garlic powder, onion powder, paprika, black pepper, salt.',cook:'Deep Fry · Air Fry · Bake',price:600,unit:'/ 10 pcs',available:true,img:null},
+  {id:'c1',cat:'cooked',emoji:'🍝',tags:['Fresh Cooked','Pasta'],name:'Pink Sauce Penne Pasta',desc:'Penne in a rich velvety tomato-cream sauce with grilled chicken and parmesan.',ingredients:'Penne pasta, chicken breast, tomatoes, fresh cream, garlic, onion, olive oil, basil, oregano, parmesan, salt, pepper.',cook:'Ready to Serve',price:550,unit:'/ serving',available:true,img:null},
+  {id:'c2',cat:'cooked',emoji:'🫕',tags:['Fresh Cooked','Italian'],name:'Classic Chicken Lasagna',desc:'Layers of lasagna sheets, chicken ragu, bechamel sauce, and melted mozzarella.',ingredients:'Lasagna sheets, chicken mince, mozzarella, cheddar, bechamel sauce, tomato sauce, garlic, onion, mixed herbs.',cook:'Ready to Serve · Can Reheat',price:950,unit:'/ serving',available:true,img:null},
+  {id:'c3',cat:'cooked',emoji:'🍜',tags:['Fresh Cooked','Pasta'],name:'Creamy Chicken Alfredo',desc:'Fettuccine in a luxuriously creamy white sauce with tender chicken and parsley.',ingredients:'Fettuccine, chicken breast, butter, fresh cream, garlic, parmesan, parsley, black pepper, nutmeg, salt.',cook:'Ready to Serve',price:600,unit:'/ serving',available:true,img:null},
+  {id:'c4',cat:'cooked',emoji:'🌶',tags:['Fresh Cooked','Pakistani'],name:'Chicken White Karahi',desc:'Rich and creamy white karahi with bone-in chicken and aromatic whole spices.',ingredients:'Bone-in chicken, fresh cream, green chilli, ginger, garlic, white pepper, cumin, whole spices, coriander, salt.',cook:'Serve with Naan or Rice',price:1100,unit:'/ serves 2',available:true,img:null},
+  {id:'c5',cat:'cooked',emoji:'🥘',tags:['Fresh Cooked','Desi'],name:'Daal Makhani',desc:'Slow-cooked black lentils in a buttery spiced tomato gravy.',ingredients:'Black urad dal, kidney beans, butter, cream, tomatoes, garlic, ginger, cumin, garam masala, red chilli, kasuri methi, salt.',cook:'Serve with Naan or Rice',price:500,unit:'/ serving',available:true,img:null},
+  {id:'c6',cat:'cooked',emoji:'🍕',tags:['Fresh Cooked','Baked'],name:'Chicken Pizza',desc:'Hand-stretched dough, tomato sauce, grilled chicken, bell peppers, melted mozzarella — baked fresh.',ingredients:'Pizza dough, tomato sauce, mozzarella, chicken breast, capsicum, onion, olives, Italian herbs.',cook:'Baked Fresh',price:750,unit:'/ 8-inch',available:true,img:null},
+];
+
+function getMenu(){
+  try{var r=localStorage.getItem('cn_menu');if(r){var p=JSON.parse(r);if(Array.isArray(p)&&p.length)return p;}}catch(e){}
+  return JSON.parse(JSON.stringify(DMENU));
+}
+function saveMenu(m){
+  try{
+    localStorage.setItem('cn_menu',JSON.stringify(m));
+    return true;
+  } catch(e){
+    // Quota exceeded — try saving without images
+    showToast('⚠️ Storage full — saving without images...');
+    try{
+      var stripped=m.map(function(item){
+        var copy=Object.assign({},item);
+        if(copy.img && copy.img.length > 10000) copy.img=null; // remove large images
+        return copy;
+      });
+      localStorage.setItem('cn_menu',JSON.stringify(stripped));
+      showToast('⚠️ Saved but images removed — use smaller photos (under 600px)');
+      return true;
+    } catch(e2){
+      showToast('❌ Storage full! Clear browser data and try again.');
+      return false;
+    }
+  }
+}
+
+// ══ STATE ══
+var curTab='frozen';
+var curTags=[];
+var curImg=null;
+var delId=null;
+
+// ══ INIT ══
+function init(){
+  if(!localStorage.getItem('cn_menu')) saveMenu(DMENU);
+  // clock
+  setInterval(function(){document.getElementById('ht').textContent=new Date().toLocaleString('en-PK');},1000);
+  // button events — using addEventListener to avoid any onclick conflicts
+  document.getElementById('addBtn').addEventListener('click',function(){openDrawer(null);});
+  document.getElementById('dcloseBtn').addEventListener('click',closeDrawer);
+  document.getElementById('dcancBtn').addEventListener('click',closeDrawer);
+  document.getElementById('dsaveBtn').addEventListener('click',saveItem);
+  document.getElementById('cnoBtn').addEventListener('click',closeConfirm);
+  document.getElementById('cyesBtn').addEventListener('click',doDelete);
+  document.getElementById('rmimgbtn').addEventListener('click',function(e){e.stopPropagation();rmImg();});
+  document.getElementById('imgfile').addEventListener('change',onImgChange);
+  document.getElementById('dov').addEventListener('click',function(e){if(e.target===this)closeDrawer();});
+  document.getElementById('tinp').addEventListener('keydown',onTag);
+  document.getElementById('tagbox').addEventListener('click',function(){document.getElementById('tinp').focus();});
+  document.getElementById('dav').addEventListener('change',syncAvLbl);
+  document.getElementById('sq').addEventListener('input',renderTable);
+  document.getElementById('af').addEventListener('change',renderTable);
+  renderAll();
+}
+
+// ══ TAB ══
+function switchTab(t){
+  curTab=t;
+  document.getElementById('t1').classList.toggle('on',t==='frozen');
+  document.getElementById('t2').classList.toggle('on',t==='cooked');
+  document.getElementById('stitle').innerHTML=t==='frozen'?'Frozen <em>Items</em>':'Cooked <em>Meals</em>';
+  document.getElementById('ssub').textContent=t==='frozen'?'Manage your frozen product listings.':'Manage your fresh cooked meal listings.';
+  document.getElementById('sq').value='';
+  document.getElementById('af').value='all';
+  renderAll();
+}
+
+// ══ RENDER ══
+function renderAll(){renderStats();renderTable();}
+
+function renderStats(){
+  var m=getMenu(),it=m.filter(function(i){return i.cat===curTab;});
+  var av=it.filter(function(i){return i.available!==false;}).length;
+  var avg=it.length?Math.round(it.reduce(function(s,i){return s+i.price;},0)/it.length):0;
+  document.getElementById('stats').innerHTML=
+    '<div class="sc"><div class="scv">'+it.length+'</div><div class="scl">Total Items</div></div>'+
+    '<div class="sc"><div class="scv" style="color:var(--gr)">'+av+'</div><div class="scl">Available</div></div>'+
+    '<div class="sc"><div class="scv" style="color:var(--rd)">'+(it.length-av)+'</div><div class="scl">Hidden</div></div>'+
+    '<div class="sc"><div class="scv">Rs '+avg+'</div><div class="scl">Avg Price</div></div>';
+}
+
+function renderTable(){
+  var menu=getMenu();
+  var items=menu.filter(function(i){return i.cat===curTab;});
+  var q=document.getElementById('sq').value.toLowerCase();
+  if(q) items=items.filter(function(i){return i.name.toLowerCase().includes(q)||(i.desc||'').toLowerCase().includes(q);});
+  var af=document.getElementById('af').value;
+  if(af==='yes') items=items.filter(function(i){return i.available!==false;});
+  if(af==='no') items=items.filter(function(i){return i.available===false;});
+  var tb=document.getElementById('tb');
+  if(!items.length){
+    tb.innerHTML='<tr><td colspan="6"><div class="empty">📭 No items found. Click "+ Add New Item" to start!</div></td></tr>';
+    return;
+  }
+  // Build rows safely using DOM to avoid innerHTML injection issues with base64
+  tb.innerHTML='';
+  items.forEach(function(item){
+    var oi=menu.findIndex(function(i){return i.id===item.id;});
+    var tr=document.createElement('tr');
+
+    // # cell
+    var td0=document.createElement('td');
+    td0.style.cssText='color:var(--mu);font-size:.73rem;';
+    td0.textContent=oi+1;
+    tr.appendChild(td0);
+
+    // Item name+thumb cell
+    var td1=document.createElement('td');
+    var icel=document.createElement('div');
+    icel.className='icel';
+    var thumb=document.createElement('div');
+    thumb.className='thumb';
+    if(item.img){
+      var timg=document.createElement('img');
+      timg.src=item.img;
+      timg.alt=item.name;
+      thumb.appendChild(timg);
+    } else {
+      thumb.textContent=item.emoji||'🍽';
+    }
+    var info=document.createElement('div');
+    var nm=document.createElement('div');
+    nm.className='iname';
+    nm.textContent=item.name;
+    var ds=document.createElement('div');
+    ds.className='idesc';
+    ds.textContent=item.desc||'';
+    info.appendChild(nm);info.appendChild(ds);
+    icel.appendChild(thumb);icel.appendChild(info);
+    td1.appendChild(icel);
+    tr.appendChild(td1);
+
+    // Tags cell
+    var td2=document.createElement('td');
+    (item.tags||[]).forEach(function(t){
+      var sp=document.createElement('span');
+      sp.className='tpill';sp.textContent=t;
+      td2.appendChild(sp);
+    });
+    if(!(item.tags||[]).length) td2.innerHTML='<span style="color:var(--mu);font-size:.72rem;">—</span>';
+    tr.appendChild(td2);
+
+    // Price cell
+    var td3=document.createElement('td');
+    td3.innerHTML='<div class="scv" style="font-size:1rem;font-family:\'Playfair Display\',serif;color:var(--gd)">Rs '+item.price+'</div><div style="font-size:.66rem;color:var(--mu)">'+(item.unit||'')+'</div>';
+    tr.appendChild(td3);
+
+    // Status cell
+    var td4=document.createElement('td');
+    var isAv=item.available!==false;
+    var chip=document.createElement('span');
+    chip.className='apill '+(isAv?'ayes':'ano');
+    chip.textContent=isAv?'✓ Available':'✕ Hidden';
+    var togrow=document.createElement('div');
+    togrow.style.marginTop='.35rem';
+    var lbl=document.createElement('label');
+    lbl.className='tog';
+    var chk=document.createElement('input');
+    chk.type='checkbox';chk.checked=isAv;
+    (function(itemId){chk.addEventListener('change',function(){toggleAvail(itemId,this.checked);});})(item.id);
+    var ttr=document.createElement('div');ttr.className='ttr';
+    lbl.appendChild(chk);lbl.appendChild(ttr);
+    togrow.appendChild(lbl);
+    td4.appendChild(chip);td4.appendChild(togrow);
+    tr.appendChild(td4);
+
+    // Actions cell
+    var td5=document.createElement('td');
+    var ar=document.createElement('div');ar.className='ar';
+    var be=document.createElement('button');be.className='ab aedit';be.textContent='✏️ Edit';
+    (function(itemId){be.addEventListener('click',function(){openDrawer(itemId);});})(item.id);
+    var bu=document.createElement('button');bu.className='ab amv';bu.textContent='↑';
+    if(oi===0) bu.disabled=true;
+    (function(itemId){bu.addEventListener('click',function(){moveItem(itemId,-1);});})(item.id);
+    var bd=document.createElement('button');bd.className='ab amv';bd.textContent='↓';
+    (function(itemId){bd.addEventListener('click',function(){moveItem(itemId,1);});})(item.id);
+    var bx=document.createElement('button');bx.className='ab adel';bx.textContent='🗑️';
+    (function(itemId,itemName){bx.addEventListener('click',function(){askDel(itemId,itemName);});})(item.id,item.name);
+    ar.appendChild(be);ar.appendChild(bu);ar.appendChild(bd);ar.appendChild(bx);
+    td5.appendChild(ar);tr.appendChild(td5);
+
+    tb.appendChild(tr);
+  });
+}
+
+// ══ TOGGLE AVAIL ══
+function toggleAvail(id,val){
+  var m=getMenu(),i=m.findIndex(function(x){return x.id===id;});
+  if(i>-1){m[i].available=val;if(saveMenu(m)){renderAll();showToast(val?'✅ Item now available':'👁 Item hidden');}}
+}
+
+// ══ MOVE ══
+function moveItem(id,dir){
+  var m=getMenu(),i=m.findIndex(function(x){return x.id===id;}),to=i+dir;
+  if(to<0||to>=m.length)return;
+  var tmp=m[i];m[i]=m[to];m[to]=tmp;
+  if(saveMenu(m)){renderTable();showToast('↕ Order updated');}
+}
+
+// ══ IMAGE ══
+function onImgChange(e){
+  var file=e.target.files[0];
+  if(!file)return;
+  if(file.size>10*1024*1024){showToast('⚠️ Too large — max 10MB');e.target.value='';return;}
+  // Compress image using canvas before storing
+  var url=URL.createObjectURL(file);
+  var img=new Image();
+  img.onload=function(){
+    var canvas=document.createElement('canvas');
+    var MAX=600; // max width/height px
+    var w=img.width,h=img.height;
+    if(w>h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}}
+    else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}}
+    canvas.width=w;canvas.height=h;
+    var ctx=canvas.getContext('2d');
+    ctx.drawImage(img,0,0,w,h);
+    var compressed=canvas.toDataURL('image/jpeg',0.7); // JPEG 70% quality
+    URL.revokeObjectURL(url);
+    curImg=compressed;
+    document.getElementById('imgel').src=curImg;
+    document.getElementById('imgprev').style.display='block';
+    document.getElementById('imgph').style.display='none';
+    // Show size info
+    var kb=Math.round(compressed.length*0.75/1024);
+    showToast('✅ Image ready — '+kb+'KB (compressed)');
+  };
+  img.onerror=function(){showToast('⚠️ Could not load image');};
+  img.src=url;
+}
+function rmImg(){
+  curImg=null;
+  document.getElementById('imgel').src='';
+  document.getElementById('imgprev').style.display='none';
+  document.getElementById('imgph').style.display='block';
+  document.getElementById('imgfile').value='';
+}
+function setImg(src){
+  curImg=src||null;
+  if(src){
+    document.getElementById('imgel').src=src;
+    document.getElementById('imgprev').style.display='block';
+    document.getElementById('imgph').style.display='none';
+  } else {
+    document.getElementById('imgel').src='';
+    document.getElementById('imgprev').style.display='none';
+    document.getElementById('imgph').style.display='block';
+  }
+}
+
+// ══ EMOJI ══
+var EMOJIS=['🥩','🍗','🍖','🧆','🫓','🍝','🍜','🫕','🍕','🥘','🌶','🍛','🍔','🌯','🥗','🍲','🧁','🧇'];
+function buildEmoji(sel){
+  var ep=document.getElementById('epick');
+  ep.innerHTML='';
+  EMOJIS.forEach(function(e){
+    var btn=document.createElement('button');
+    btn.type='button';btn.className='ep'+(e===sel?' on':'');
+    btn.textContent=e;
+    btn.addEventListener('click',function(){
+      document.getElementById('de').value=e;
+      document.querySelectorAll('.ep').forEach(function(b){b.classList.toggle('on',b.textContent===e);});
+    });
+    ep.appendChild(btn);
+  });
+}
+
+// ══ TAGS ══
+function onTag(e){
+  if(e.key==='Enter'||e.key===','){
+    e.preventDefault();
+    var v=document.getElementById('tinp').value.trim().replace(/,/g,'');
+    if(v&&curTags.indexOf(v)===-1){curTags.push(v);renderTags();}
+    document.getElementById('tinp').value='';
+  }
+  if(e.key==='Backspace'&&!document.getElementById('tinp').value&&curTags.length){
+    curTags.pop();renderTags();
+  }
+}
+function rmTag(t){curTags=curTags.filter(function(x){return x!==t;});renderTags();}
+function renderTags(){
+  var box=document.getElementById('tagbox');
+  var inp=document.getElementById('tinp');
+  box.querySelectorAll('.tchip').forEach(function(c){c.remove();});
+  curTags.forEach(function(t){
+    var c=document.createElement('span');c.className='tchip';
+    var tx=document.createElement('span');tx.className='tx';tx.textContent='×';
+    (function(tag){tx.addEventListener('click',function(){rmTag(tag);});})(t);
+    c.textContent=t;c.appendChild(tx);
+    box.insertBefore(c,inp);
+  });
+}
+function syncAvLbl(){
+  document.getElementById('avlbl').textContent=
+    document.getElementById('dav').checked?'Available for Order':'Hidden from Menu';
+}
+
+// ══ DRAWER ══
+function openDrawer(id){
+  // Reset form
+  curTags=[];curImg=null;
+  document.getElementById('eid').value='';
+  document.getElementById('dn').value='';
+  document.getElementById('dc').value=curTab;
+  document.getElementById('dd').value='';
+  document.getElementById('di').value='';
+  document.getElementById('dco').value='';
+  document.getElementById('dp').value='';
+  document.getElementById('du').value='';
+  document.getElementById('de').value='🍽';
+  document.getElementById('dav').checked=true;
+  document.getElementById('avlbl').textContent='Available for Order';
+  document.getElementById('imgfile').value='';
+  setImg(null);buildEmoji('🍽');renderTags();
+
+  if(id){
+    var item=getMenu().find(function(i){return i.id===id;});
+    if(!item){showToast('Item not found!');return;}
+    document.getElementById('dtitle').innerHTML='Edit <em>Item</em>';
+    document.getElementById('eid').value=item.id;
+    document.getElementById('dn').value=item.name||'';
+    document.getElementById('dc').value=item.cat||curTab;
+    document.getElementById('dd').value=item.desc||'';
+    document.getElementById('di').value=item.ingredients||'';
+    document.getElementById('dco').value=item.cook||'';
+    document.getElementById('dp').value=item.price||'';
+    document.getElementById('du').value=item.unit||'';
+    document.getElementById('de').value=item.emoji||'🍽';
+    document.getElementById('dav').checked=item.available!==false;
+    document.getElementById('avlbl').textContent=item.available!==false?'Available for Order':'Hidden from Menu';
+    curTags=(item.tags||[]).slice();
+    setImg(item.img||null);
+    buildEmoji(item.emoji||'🍽');
+    renderTags();
+  } else {
+    document.getElementById('dtitle').innerHTML='Add <em>New Item</em>';
+  }
+  document.getElementById('dov').classList.add('open');
+  document.getElementById('drawer').scrollTop=0;
+}
+function closeDrawer(){document.getElementById('dov').classList.remove('open');}
+
+// ══ SAVE ══
+function saveItem(){
+  var name=document.getElementById('dn').value.trim();
+  var desc=document.getElementById('dd').value.trim();
+  var priceStr=document.getElementById('dp').value.trim();
+  var price=parseInt(priceStr);
+
+  if(!name){showToast('⚠️ Item name is required!');document.getElementById('dn').focus();return;}
+  if(!desc){showToast('⚠️ Description is required!');document.getElementById('dd').focus();return;}
+  if(!priceStr||isNaN(price)||price<1){showToast('⚠️ Please enter a valid price!');document.getElementById('dp').focus();return;}
+
+  var editId=document.getElementById('eid').value;
+  var menu=getMenu();
+  var newItem={
+    id:editId||(('item_'+Date.now())),
+    cat:document.getElementById('dc').value,
+    name:name,
+    desc:desc,
+    ingredients:document.getElementById('di').value.trim(),
+    cook:document.getElementById('dco').value.trim(),
+    price:price,
+    unit:document.getElementById('du').value.trim(),
+    emoji:document.getElementById('de').value||'🍽',
+    tags:curTags.slice(),
+    available:document.getElementById('dav').checked,
+    img:curImg||null
+  };
+
+  if(editId){
+    var idx=menu.findIndex(function(i){return i.id===editId;});
+    if(idx>-1) menu[idx]=newItem; else menu.push(newItem);
+  } else {
+    menu.push(newItem);
+  }
+
+  if(saveMenu(menu)){
+    closeDrawer();
+    if(newItem.cat!==curTab) switchTab(newItem.cat); else renderAll();
+    showToast(editId?'✅ Item updated!':'✅ New item added!');
+  }
+}
+
+// ══ DELETE ══
+function askDel(id,name){
+  delId=id;
+  document.getElementById('ctxt').textContent='Delete "'+name+'"? This cannot be undone.';
+  document.getElementById('cov').classList.add('open');
+}
+function closeConfirm(){document.getElementById('cov').classList.remove('open');delId=null;}
+function doDelete(){
+  if(!delId)return;
+  var m=getMenu().filter(function(i){return i.id!==delId;});
+  if(saveMenu(m)){closeConfirm();renderAll();showToast('🗑️ Item deleted.');}
+}
+
+// ══ TOAST ══
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.style.display='block';
+  clearTimeout(t._t);t._t=setTimeout(function(){t.style.display='none';},3000);
+}
+</script>
+</body>
+</html>
